@@ -1201,10 +1201,11 @@ async function exportPDF(company, reportText) {
   newPage();
   const textOnly = reportText.replace(/<<<CHART:\w+>>>[\s\S]*?<<<END_CHART>>>/g, "<<<CHART_PLACEHOLDER>>>");
   const cleanText = textOnly.replace(/\*\*/g,"");
+  const safeText = cleanText.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}]/gu, '').replace(/\s+/g, ' ');
   let chartQueue = ["SCENARIO","GROWTH","REVENUE","MARGIN","FCF","CAPSTR","COMPS","SENS","PROB","CATALYST"];
   let chartIdx = 0;
 
-  for (const line of cleanText.split("\n")) {
+  for (const line of safeText.split("\n")) {
     const clean = line.trim();
     if (!clean) { y+=3; continue; }
 
@@ -1223,12 +1224,15 @@ async function exportPDF(company, reportText) {
       continue;
     }
 
-    if (/^[🎯💡🔍📋]/.test(clean)) {
+    if (/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u2460-\u2473\u{FE00}-\u{FE0F}\u{1F300}-\u{1F9FF}\u00A9\u00AE\u203C\u2049\u25AA-\u25FE\u2614-\u2615\u{1F000}-\u{1FFFF}]/u.test(clean)) {
       checkY(26);
       setFill("#010c07"); doc.rect(L-4,y-2,TW+8,22,"F");
       setFill("#00ffaa"); doc.rect(L-4,y-2,2,22,"F");
       doc.setFont("Courier","bold"); doc.setFontSize(7.5); setTxt("#00ffaa");
-      doc.text(("▶ "+clean).toUpperCase().slice(0,90), L+6, y+13);
+      const hdrText = clean.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{20D0}-\u{20FF}]/gu, '').trim();
+      const hdrWrapped = doc.splitTextToSize(hdrText.toUpperCase(), TW - 12);
+      checkY(hdrWrapped.length * 13 + 6);
+      doc.text(hdrWrapped[0] || hdrText.toUpperCase().slice(0, 60), L+6, y+13);
       setDraw("#0a2318"); doc.setLineWidth(0.3); doc.line(L,y+20,R,y+20);
       y+=28; continue;
     }
