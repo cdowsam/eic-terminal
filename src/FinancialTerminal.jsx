@@ -842,14 +842,14 @@ async function exportPDF(company, reportText) {
   setDraw("#0a3a20"); doc.setLineWidth(0.5); doc.rect(L-6, 58, TW+12, 190, "S");
   setFill("#00ff88"); doc.rect(L-6, 58, TW+12, 3, "F");
 
-  doc.setFont("Courier","bold"); doc.setFontSize(34); setTxt("#00ff88");
+  doc.setFont("Courier","bold"); doc.setFontSize(34); setTxt("#000000");
   doc.text(company.toUpperCase(), PW/2, 125, {align:"center"});
-  doc.setFontSize(10.5); setTxt("#00ccaa");
+  doc.setFontSize(10.5); setTxt("#000000");
   doc.text("EQUITY INTELLIGENCE REPORT", PW/2, 148, {align:"center"});
-  doc.setFont("Courier","normal"); doc.setFontSize(8); setTxt("#336644");
+  doc.setFont("Courier","normal"); doc.setFontSize(8); setTxt("#111111");
   doc.text("IB-GRADE  ·  REVERSE DCF ENGINE  ·  LIVE DATA  ·  DEAL RADAR ACTIVE", PW/2, 166, {align:"center"});
   setDraw("#0a3a20"); doc.setLineWidth(0.4); doc.line(L+50, 180, R-50, 180);
-  doc.setFontSize(7.5); setTxt("#1a5a30");
+  doc.setFontSize(7.5); setTxt("#222222");
   doc.text(`GENERATED: ${new Date().toLocaleString().toUpperCase()}`, PW/2, 194, {align:"center"});
   doc.text("ANALYST EYES ONLY  ·  DO NOT DISTRIBUTE", PW/2, 208, {align:"center"});
 
@@ -862,9 +862,9 @@ async function exportPDF(company, reportText) {
     const cx = i%2===0 ? L+8 : PW/2+14;
     if (i%2===0 && i>0) y+=18;
     setFill("#00ff88"); doc.circle(cx-4, y-3, 2.5, "F");
-    doc.setFont("Courier","normal"); doc.setFontSize(7.5); setTxt("#336644");
+    doc.setFont("Courier","normal"); doc.setFontSize(7.5); setTxt("#000000");
     doc.text(`${st[0]}: `, cx+4, y);
-    setTxt("#00ff88"); doc.text(st[1], cx+4+doc.getTextWidth(`${st[0]}: `), y);
+    setTxt("#000000"); doc.text(st[1], cx+4+doc.getTextWidth(`${st[0]}: `), y);
   });
   y += 28;
 
@@ -933,7 +933,7 @@ async function exportPDF(company, reportText) {
     setFill("#010c07"); doc.rect(L-4,y-4,TW+8,boxH+20,"F");
     setDraw("#0a2318"); doc.rect(L-4,y-4,TW+8,boxH+20,"S");
     setFill("#00ff88"); doc.rect(L-4,y-4,TW+8,2,"F");
-    doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#1a5a30");
+    doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#000000");
     doc.text("[ 5-YEAR REVENUE PROJECTIONS ($B) ]", L+4, y+10); y+=20;
     const allV=data.flatMap(r=>[r.bull,r.base,r.bear]).filter(v=>!isNaN(v));
     const maxV=Math.max(...allV)*1.1, minV=Math.min(...allV)*0.9;
@@ -1030,9 +1030,9 @@ async function exportPDF(company, reportText) {
     });
     data.ratios?.forEach(r=>{
       setFill("#00ff8806"); doc.rect(L,y,TW,12,"F");
-      doc.setFont("Courier","normal"); doc.setFontSize(7); setTxt("#1a5a30");
+      doc.setFont("Courier","normal"); doc.setFontSize(7); setTxt("#000000");
       doc.text(`${r.label}: `,L+4,y+9);
-      setTxt("#00ffcc"); doc.setFont("Courier","bold"); doc.text(`${r.value}x`,L+4+doc.getTextWidth(`${r.label}: `),y+9);
+      setTxt("#000000"); doc.setFont("Courier","bold"); doc.text(`${r.value}x`,L+4+doc.getTextWidth(`${r.label}: `),y+9);
       y+=14;
     });
     y+=12;
@@ -1103,7 +1103,7 @@ async function exportPDF(company, reportText) {
     setFill("#010c07"); doc.rect(L-4,y-4,TW+8,boxH,"F");
     setDraw("#0a2318"); doc.rect(L-4,y-4,TW+8,boxH,"S");
     setFill("#00ff88"); doc.rect(L-4,y-4,TW+8,2,"F");
-    doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#1a5a30");
+    doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#000000");
     doc.text("[ SCENARIO VALUATION — PRICE TARGETS ]", L+4, y+10);
     y+=22;
     const maxP = Math.max(...data.map(d=>d.price))*1.15;
@@ -1128,7 +1128,7 @@ async function exportPDF(company, reportText) {
     setFill("#010c07"); doc.rect(L-4,y-4,TW+8,total,"F");
     setDraw("#0a2318"); doc.rect(L-4,y-4,TW+8,total,"S");
     setFill("#00ccff"); doc.rect(L-4,y-4,TW+8,2,"F");
-    doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#1a5a50");
+    doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#000000");
     doc.text("[ TRADING COMPARABLES — EV/EBITDA NTM ]", L+4, y+10);
     y+=22;
     const colW=[80,TW-250,65,55,55];
@@ -1228,7 +1228,7 @@ async function exportPDF(company, reportText) {
       checkY(26);
       setFill("#010c07"); doc.rect(L-4,y-2,TW+8,22,"F");
       setFill("#00ffaa"); doc.rect(L-4,y-2,2,22,"F");
-      doc.setFont("Courier","bold"); doc.setFontSize(7.5); setTxt("#00ffaa");
+      doc.setFont("Courier","bold"); doc.setFontSize(7.5); setTxt("#000000");
       const hdrText = clean.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{20D0}-\u{20FF}]/gu, '').trim();
       const hdrWrapped = doc.splitTextToSize(hdrText.toUpperCase(), TW - 12);
       checkY(hdrWrapped.length * 13 + 6);
@@ -1241,7 +1241,7 @@ async function exportPDF(company, reportText) {
       checkY(wrapped.length*11+10);
       setFill("#00ff8806"); doc.rect(L-2,y-1,TW+4,wrapped.length*11+6,"F");
       setFill("#00ff88"); doc.rect(L-2,y-1,2,wrapped.length*11+6,"F");
-      doc.setFont("Courier","normal"); doc.setFontSize(7.5); setTxt("#ccffe8");
+      doc.setFont("Courier","normal"); doc.setFontSize(7.5); setTxt("#111111");
       wrapped.forEach((wl,wi)=>{ doc.text(wl,L+8,y+9+wi*11); });
       y+=wrapped.length*11+10; continue;
     }
