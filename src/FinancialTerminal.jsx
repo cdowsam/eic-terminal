@@ -43,21 +43,21 @@ FCF|[pct]
 
 After the FCFF calculation in Forward DCF:
 <<<CHART:FCF_BRIDGE>>>
-EBITDA|[value_$b]|positive
-DA_ADD|[value_$b]|positive
-CAPEX|[value_$b]|negative
-WC_CHANGE|[value_$b]|negative
-TAX|[value_$b]|negative
-FCFF|[value_$b]|result
+EBITDA|[value_in_natural_unit]|positive
+DA_ADD|[value_in_natural_unit]|positive
+CAPEX|[value_in_natural_unit]|negative
+WC_CHANGE|[value_in_natural_unit]|negative
+TAX|[value_in_natural_unit]|negative
+FCFF|[value_in_natural_unit]|result
 <<<END_CHART>>>
 
 After the Narrative section describing segment breakdown:
 <<<CHART:GROWTH_DECOMP>>>
 SEGMENT|REVENUE|GROWTH|MARGIN|COLOR
-[segment]|[rev_$b]|[growth_pct]|[margin_pct]|#00ff88
-[segment]|[rev_$b]|[growth_pct]|[margin_pct]|#00ccff
-[segment]|[rev_$b]|[growth_pct]|[margin_pct]|#ffaa00
-[segment]|[rev_$b]|[growth_pct]|[margin_pct]|#aa44ff
+[segment]|[revenue_natural_unit]|[growth_pct]|[margin_pct]|#00ff88
+[segment]|[revenue_natural_unit]|[growth_pct]|[margin_pct]|#00ccff
+[segment]|[revenue_natural_unit]|[growth_pct]|[margin_pct]|#ffaa00
+[segment]|[revenue_natural_unit]|[growth_pct]|[margin_pct]|#aa44ff
 <<<END_CHART>>>
 
 After the Comps section:
@@ -380,6 +380,7 @@ function RevenueModelChart({ data }) {
   if (!data.length) return null;
   const allVals = data.flatMap(r => [r.bull, r.base, r.bear]).filter(v => !isNaN(v));
   const maxV = Math.max(...allVals) * 1.12;
+  const revUnit=maxV>20?'M':'B';
   const minV = Math.min(...allVals) * 0.9;
   const range = maxV - minV;
   const W = 480, H = 140, padL = 48, padR = 12, padT = 12, padB = 28;
@@ -398,7 +399,7 @@ function RevenueModelChart({ data }) {
 
   return (
     <div style={{ background:"#010c07", border:"1px solid #0a2318", borderRadius:2, padding:"1rem 1.2rem", margin:"0.8rem 0", fontFamily:"monospace" }}>
-      <div style={{ fontSize:"0.58rem", color:"#336644", letterSpacing:"0.2em", marginBottom:"0.6rem" }}>[ FORWARD DCF — 5-YEAR REVENUE PROJECTIONS ($B) ]</div>
+      <div style={{ fontSize:"0.58rem", color:"#336644", letterSpacing:"0.2em", marginBottom:"0.6rem" }}>[ FORWARD DCF — 5-YEAR REVENUE PROJECTIONS ($${growthUnit}) ]</div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}>
         {/* Grid lines */}
         {[0,0.25,0.5,0.75,1].map(t => {
@@ -406,7 +407,7 @@ function RevenueModelChart({ data }) {
           const val = maxV - (range * t);
           return <g key={t}>
             <line x1={padL} y1={y} x2={W-padR} y2={y} stroke="#0a2318" strokeWidth="0.5" />
-            <text x={padL-4} y={y+3} textAnchor="end" fontSize="7" fill="#336644">${val.toFixed(0)}B</text>
+            <text x={padL-4} y={y+3} textAnchor="end" fontSize="7" fill="#336644">${val.toFixed(revUnit==='M'?0:1)}{revUnit}</text>
           </g>;
         })}
         {/* Year labels */}
@@ -471,10 +472,11 @@ function MarginBridgeChart({ data }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function FCFBridgeChart({ data }) {
   if (!data.length) return null;
-  const maxAbs = Math.max(...data.map(d => Math.abs(d.value))) * 1.15;
+  const maxAbs=Math.max(...data.map(d=>Math.abs(d.value)));
+  const fcfCompUnit=maxAbs>20?'M':'B';
   return (
     <div style={{ background:"#010c07", border:"1px solid #0a2318", borderRadius:2, padding:"1rem 1.2rem", margin:"0.8rem 0", fontFamily:"monospace" }}>
-      <div style={{ fontSize:"0.58rem", color:"#336644", letterSpacing:"0.2em", marginBottom:"0.8rem" }}>[ FCF BRIDGE — EBITDA TO FREE CASH FLOW ($B) ]</div>
+      <div style={{ fontSize:"0.58rem", color:"#336644", letterSpacing:"0.2em", marginBottom:"0.8rem" }}>[ FCF BRIDGE — EBITDA TO FREE CASH FLOW ($${fcfCompUnit}) ]</div>
       {data.map((d, i) => {
         const isResult = d.type === "result";
         const isNeg = d.type === "negative";
@@ -489,7 +491,7 @@ function FCFBridgeChart({ data }) {
               <div style={{ height:"100%", width:`${barPct}%`, background:col, borderRadius:1, boxShadow:`0 0 5px ${col}44`, marginLeft: isNeg ? `${85 - barPct}%` : 0 }} />
             </div>
             <span style={{ width:55, fontSize:"0.63rem", color:col, fontWeight: isResult?700:400, textAlign:"right" }}>
-              {isNeg ? "-" : ""}${Math.abs(d.value).toFixed(1)}B
+              {isNeg ? "-" : ""}${Math.abs(d.value).toFixed(fcfCompUnit==='M'?0:1)}{fcfCompUnit}
             </span>
           </div>
         );
@@ -504,6 +506,7 @@ function FCFBridgeChart({ data }) {
 function GrowthDecompChart({ data }) {
   if (!data.length) return null;
   const totalRev = data.reduce((s, d) => s + d.revenue, 0);
+  const growthCompUnit=totalRev>20?'M':'B';
   return (
     <div style={{ background:"#010c07", border:"1px solid #0a2318", borderRadius:2, padding:"1rem 1.2rem", margin:"0.8rem 0", fontFamily:"monospace" }}>
       <div style={{ fontSize:"0.58rem", color:"#336644", letterSpacing:"0.2em", marginBottom:"0.7rem" }}>[ SEGMENT BREAKDOWN — REVENUE · GROWTH · MARGIN ]</div>
@@ -514,7 +517,7 @@ function GrowthDecompChart({ data }) {
           return (
             <div key={i} style={{ border:`1px solid ${d.color}22`, background:`${d.color}06`, borderRadius:2, padding:"0.6rem 0.75rem" }}>
               <div style={{ fontSize:"0.6rem", color:d.color, fontWeight:700, letterSpacing:"0.08em", marginBottom:"0.3rem", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{d.segment}</div>
-              <div style={{ fontSize:"0.7rem", color:"#ccffe8", fontWeight:700 }}>${d.revenue.toFixed(1)}B</div>
+              <div style={{ fontSize:"0.7rem", color:"#ccffe8", fontWeight:700 }}>${d.revenue.toFixed(growthCompUnit==='M'?0:1)}{growthCompUnit}</div>
               <div style={{ fontSize:"0.52rem", color:"#336644", marginTop:"0.15rem" }}>{share}% of total</div>
               <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.4rem", fontSize:"0.55rem" }}>
                 <span style={{ color:growthCol }}>↑ {d.growth}% YoY</span>
@@ -528,7 +531,7 @@ function GrowthDecompChart({ data }) {
         })}
       </div>
       <div style={{ marginTop:"0.5rem", fontSize:"0.52rem", color:"#1a4a28" }}>
-        TOTAL REVENUE: ${totalRev.toFixed(1)}B · {data.length} SEGMENTS
+        TOTAL REVENUE: ${totalRev.toFixed(growthCompUnit==='M'?0:1)}{growthCompUnit} · {data.length} SEGMENTS
       </div>
     </div>
   );
@@ -539,6 +542,7 @@ function GrowthDecompChart({ data }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function CapitalStructureChart({ data }) {
   if (!data.items?.length) return null;
+  const capChartUnit=data.items.length?Math.max(...data.items.map(d=>Math.abs(d.value||0)))>20?'M':'B':'B';
   const total = data.items.reduce((s, d) => s + Math.abs(d.value), 0);
   // Simple SVG donut
   const R = 48, CX = 68, CY = 60, stroke = 18;
@@ -571,7 +575,7 @@ function CapitalStructureChart({ data }) {
           ))}
           <circle cx={CX} cy={CY} r={R - stroke/2 - 1} fill="#010c07" />
           <text x={CX} y={CY-6} textAnchor="middle" fontSize="8" fill="#336644" fontFamily="monospace">TOTAL</text>
-          <text x={CX} y={CY+7} textAnchor="middle" fontSize="9" fill="#00ffcc" fontFamily="monospace" fontWeight="bold">${total.toFixed(0)}B</text>
+          <text x={CX} y={CY+7} textAnchor="middle" fontSize="9" fill="#00ffcc" fontFamily="monospace" fontWeight="bold">${total.toFixed(capChartUnit==='M'?0:1)}{capChartUnit}</text>
         </svg>
         <div style={{ flex:1 }}>
           {data.items.map((d, i) => {
@@ -583,7 +587,7 @@ function CapitalStructureChart({ data }) {
                   <span style={{ fontSize:"0.6rem", color:"#336644" }}>{d.label}</span>
                 </div>
                 <div style={{ textAlign:"right" }}>
-                  <span style={{ fontSize:"0.65rem", color:d.color, fontWeight:700 }}>${d.value.toFixed(1)}B</span>
+                  <span style={{ fontSize:"0.65rem", color:d.color, fontWeight:700 }}>${d.value.toFixed(capChartUnit==='M'?0:1)}{capChartUnit}</span>
                   <span style={{ fontSize:"0.52rem", color:"#1a4a28", marginLeft:"0.4rem" }}>{pct}%</span>
                 </div>
               </div>
@@ -899,6 +903,7 @@ async function exportPDF(company, reportText) {
 
   const drawGrowthChart = (data) => {
     if(!data.length) return;
+    const growthUnit=Math.max(...data.map(d=>Math.abs(d.revenue||0)))>20?'M':'B';
     const rowH=18, total=data.length*rowH+52;
     checkY(total);
     setFill("#010c07"); doc.rect(L-4,y-4,TW+8,total,"F");
@@ -920,7 +925,7 @@ async function exportPDF(company, reportText) {
       doc.text((d.segment||"").slice(0,12),cx2,y+8); cx2+=colW[0];
       const bw=((d.revenue||0)/maxRev)*colW[1];
       doc.setFillColor(rr,rg,rb); doc.rect(cx2,y+2,bw,8,"F"); cx2+=colW[1];
-      setTxt("#ccffe8"); doc.text(`$${(d.revenue||0).toFixed(1)}B`,cx2,y+8); cx2+=colW[2];
+      setTxt("#ccffe8"); doc.text(`$${(d.revenue||0).toFixed(growthUnit==='M'?0:1)} ${growthUnit}`,cx2,y+8); cx2+=colW[2];
       const gcol=d.growth>=15?"#00ff88":d.growth>=5?"#00ccff":d.growth>=0?"#ffaa00":"#ff4444";
       setTxt(gcol); doc.text(`${d.growth>=0?"+":""}${d.growth}%`,cx2,y+8); cx2+=colW[3];
       setTxt("#4a8a60"); doc.text(`${d.margin}%`,cx2,y+8);
@@ -989,8 +994,9 @@ async function exportPDF(company, reportText) {
     setDraw("#0a2318"); doc.rect(L-4,y-4,TW+8,boxH,"S");
     setFill("#ffaa00"); doc.rect(L-4,y-4,TW+8,2,"F");
     doc.setFont("Courier","normal"); doc.setFontSize(6.5); setTxt("#5a4a10");
-    doc.text("[ FCF BRIDGE — EBITDA TO FREE CASH FLOW ($B) ]", L+4, y+10); y+=20;
+    doc.text("[ FCF BRIDGE — EBITDA TO FREE CASH FLOW ($${fcfUnit}) ]", L+4, y+10); y+=20;
     const maxA=Math.max(...data.map(d=>Math.abs(d.value)))*1.1;
+    const fcfUnit=maxA>20?'M':'B';
     const BAR_MAX=(TW-110)/2;
     data.forEach(d=>{
       const isRes=d.type==="result", isNeg=d.type==="negative";
@@ -1003,7 +1009,7 @@ async function exportPDF(company, reportText) {
       const barX=isNeg?L+96+BAR_MAX-bw:L+96;
       doc.setFillColor(rr,rg,rb); doc.rect(barX,y+1,bw,8,"F");
       setTxt(col); doc.setFont("Courier","bold"); doc.setFontSize(7);
-      doc.text(`${isNeg?"-":""}$${Math.abs(d.value).toFixed(1)}B`,L+96+BAR_MAX*2+6,y+8);
+      doc.text(`${isNeg?"-":""}$${Math.abs(d.value).toFixed(fcfUnit==='M'?0:1)} ${fcfUnit}`,L+96+BAR_MAX*2+6,y+8);
       y+=18;
     });
     y+=12;
@@ -1013,6 +1019,7 @@ async function exportPDF(company, reportText) {
     if(!data.items?.length) return;
     const total=data.items.reduce((s,d)=>s+Math.abs(d.value),0);
     const boxH=data.items.length*18+data.ratios?.length*14+52;
+    const capUnit=data.items.length?Math.max(...data.items.map(d=>Math.abs(d.value||0)))>20?'M':'B':'B';
     checkY(boxH);
     setFill("#010c07"); doc.rect(L-4,y-4,TW+8,boxH,"F");
     setDraw("#0a2318"); doc.rect(L-4,y-4,TW+8,boxH,"S");
@@ -1028,7 +1035,7 @@ async function exportPDF(company, reportText) {
       doc.text(d.label,L+4,y+8);
       doc.setFillColor(rr,rg,rb); doc.rect(L+60,y+1,bw,8,"F");
       setTxt(d.color||"#4a8a60"); doc.setFont("Courier","bold"); doc.setFontSize(7);
-      doc.text(`$${d.value.toFixed(1)}B (${pct}%)`,L+60+BAR_MAX+6,y+8);
+      doc.text(`$${d.value.toFixed(capUnit==='M'?0:1)} ${capUnit} (${pct}%)`,L+60+BAR_MAX+6,y+8);
       y+=16;
     });
     data.ratios?.forEach(r=>{
