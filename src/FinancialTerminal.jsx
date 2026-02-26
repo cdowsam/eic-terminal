@@ -152,6 +152,9 @@ OUTPUT STRUCTURE — follow this order exactly:
 🔍 DEAL RADAR
 [M&A activity: confirmed deals, rumors, activist positions, stake changes. OFFICIAL vs RUMOR. Source every item.]
 
+🏦 INSTITUTIONAL FLOW
+[Top institutional ownership changes from latest 13F filings. Include: (1) TOP ACCUMULATORS — largest new positions or significant increases by major institutions/hedge funds with share counts and % change; (2) TOP SELLERS — notable exits or largest reductions with share counts; (3) ACTIVIST RADAR — any activist investors with disclosed stakes or reported campaigns; (4) NET POSITIONING — overall institutional sentiment (net buyer/seller last quarter). Format each entry as: INSTITUTION | ACTION | POSITION SIZE | % CHANGE | QUARTER. Highlight any unusual conviction moves (10%+ position changes by top-20 holders).]
+
 💡 SO WHAT — INVESTMENT DECISION
 [Probability-weighted fair value. Bull/Base/Bear case probabilities and prices. Weighted average vs current = upside/downside %. One-line verdict in ALLCAPS. Event calendar: 3-5 upcoming events with timing and ±% price impact.]
 
@@ -854,7 +857,7 @@ async function exportPDF(company, reportText) {
   doc.text("ANALYST EYES ONLY  ·  DO NOT DISTRIBUTE", PW/2, 208, {align:"center"});
 
   y = 285;
-  const statuses = [["NARRATIVE ENG","ACTIVE"],["REVERSE DCF","COMPLETE"],["FORWARD DCF","COMPLETE"],["COMPS","VERIFIED"],["DEAL RADAR","SCANNED"],["WEB UPLINK","LIVE"]];
+  const statuses = [["NARRATIVE ENG","ACTIVE"],["REVERSE DCF","COMPLETE"],["FORWARD DCF","COMPLETE"],["COMPS","VERIFIED"],["DEAL RADAR","SCANNED"],["INST FLOW","VERIFIED"],["WEB UPLINK","LIVE"]];
   setFill("#010c07"); doc.rect(L-4, y-8, TW+8, 76, "F");
   setDraw("#0a2318"); doc.rect(L-4, y-8, TW+8, 76, "S");
   y += 8;
@@ -868,7 +871,7 @@ async function exportPDF(company, reportText) {
   });
   y += 28;
 
-  const toc = ["10 KEY POINTS","NARRATIVE ANALYSIS","REVERSE DCF + SCENARIO CHART","FORWARD DCF MODEL","TRADING COMPARABLES + COMPS CHART","SENSITIVITY MATRIX","DEAL RADAR","SO WHAT — INVESTMENT DECISION","ASSUMPTIONS & CONFIDENCE CHECKLIST"];
+  const toc = ["10 KEY POINTS","NARRATIVE ANALYSIS","REVERSE DCF + SCENARIO CHART","FORWARD DCF MODEL","TRADING COMPARABLES + COMPS CHART","SENSITIVITY MATRIX","DEAL RADAR","INSTITUTIONAL FLOW","SO WHAT — INVESTMENT DECISION","ASSUMPTIONS & CONFIDENCE CHECKLIST"];
   setFill("#010c07"); doc.rect(L-4, y, TW+8, toc.length*11+22, "F");
   setDraw("#0a2318"); doc.rect(L-4, y, TW+8, toc.length*11+22, "S");
   y += 12;
@@ -1414,7 +1417,7 @@ export default function App() {
     finally { setExporting(false); }
   };
 
-  const frameworks = ["NARRATIVE","GROWTH DECOMP","REVERSE DCF","REVENUE MODEL","MARGIN BRIDGE","FCF BRIDGE","CAP STRUCTURE","TRADING COMPS","SENSITIVITY","PROBABILITY","CATALYSTS","DEAL RADAR","SO WHAT"];
+  const frameworks = ["NARRATIVE","GROWTH DECOMP","REVERSE DCF","REVENUE MODEL","MARGIN BRIDGE","FCF BRIDGE","CAP STRUCTURE","TRADING COMPS","SENSITIVITY","PROBABILITY","CATALYSTS","DEAL RADAR","INST FLOW","SO WHAT"];
 
   return (
     <div style={{ minHeight:"100vh", background:"#030e07", color:"#00ff88", fontFamily:"'Courier New',Courier,monospace", display:"flex", flexDirection:"column", overflow:"hidden" }}>
